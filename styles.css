@@ -1,0 +1,80 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #ff9a8d; /* Bright gradient background color 1 */
+    background-image: linear-gradient(315deg, #ff9a8d 0%, #ff6a88 74%); /* Gradient background */
+    color: black;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.hidden {
+    display: none;
+}
+
+.container {
+    max-width: 600px;
+    background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent background for container */
+    border-radius: 10px;
+    box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+    padding: 20px;
+    box-sizing: border-box;
+    backdrop-filter: blur(10px); /* Gives a frosted glass look */
+}
+
+button {
+    background-color: #6c5ce7; /* Primary color for buttons */
+    color: #ffffff;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 50px; /* Making it pill shaped */
+    cursor: pointer;
+    transition: all 0.3s ease; /* Smooth transition for all changes */
+    width: 100%; 
+    margin-top: 10px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+}
+
+button:hover {
+    background-color: green; /* Slightly lighter shade on hover */
+    transform: translateY(-3px); /* Button raises up a bit */
+}
+
+button:active {
+    transform: translateY(1px); /* Push effect on active */
+}
+
+#question {
+    font-size: 1.5em;
+    margin-bottom: 15px;
+}
+
+#timer {
+    margin-top: 20px;
+    background-color: #e17055;
+    color: #ffffff;
+    padding: 10px;
+    border-radius: 50px; /* Making it pill shaped */
+    font-weight: bold;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+}
+#scoreDisplay {
+    font-size: 1.2em;
+    margin-top: 15px;
+    text-align: center;
+}
+
+#score {
+    font-weight: bold;
+    color: green; /* Score text color */
+}
+
+/* For devices with width greater than 600px */
+@media screen and (min-width: 600px) {
+    button {
+        width: auto;
+    }
+}
