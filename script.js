@@ -2,7 +2,6 @@ let score = 0;
 let timer = 60;
 let interval;
 
-// Select the score display element
 const scoreDisplay = document.getElementById('score');
 const startRulesDiv = document.getElementById("start-rules");
 
@@ -12,7 +11,7 @@ document.getElementById('startQuiz').addEventListener('click', function () {
     document.getElementById('quizScreen').classList.remove('hidden');
     getQuestion();
     startTimer();
-    updateScore(); // Initialize score display
+    updateScore();
 });
 
 document.getElementById('playAgain').addEventListener('click', function () {
@@ -22,46 +21,43 @@ document.getElementById('playAgain').addEventListener('click', function () {
     document.getElementById('quizScreen').classList.remove('hidden');
     getQuestion();
     startTimer();
-    updateScore(); // Reset score display
+    updateScore();
 });
 
-function getQuestion() {
-    // Fetching questions from an API. Using Open Trivia DB as an example.
-    fetch('https://opentdb.com/api.php?amount=1')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+async function getQuestion() {
+    try {
+        const response = await fetch('https://opentdb.com/api.php?amount=1');
+        
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        const question = data.results[0];
+        document.getElementById('question').textContent = question.question;
+
+        const correctIndex = Math.floor(Math.random() * 4);
+        const answerButtons = document.querySelectorAll('.answer');
+
+        answerButtons.forEach((button, index) => {
+            if (index === correctIndex) {
+                button.textContent = question.correct_answer;
+                button.onclick = () => correctAnswer();
+            } else {
+                button.textContent = question.incorrect_answers.pop();
+                button.onclick = () => wrongAnswer();
             }
-            return response.json();
-        })
-        .then(data => {
-            const question = data.results[0];
-            document.getElementById('question').textContent = question.question;
-
-            const correctIndex = Math.floor(Math.random() * 4);
-            const answerButtons = document.querySelectorAll('.answer');
-
-            answerButtons.forEach((button, index) => {
-                if (index === correctIndex) {
-                    button.textContent = question.correct_answer;
-                    button.onclick = () => correctAnswer();
-                } else {
-                    button.textContent = question.incorrect_answers.pop();
-                    button.onclick = () => wrongAnswer();
-                }
-            });
-        })
-        .catch(error => {
-            console.error('There was a problem with the fetch operation:', error.message);
-            // Handle the error gracefully, maybe show an error message to the user
-            document.getElementById('question').textContent = "Error fetching the question. Please try again.";
         });
-}
 
+    } catch (error) {
+        console.error('There was a problem with the fetch operation:', error.message);
+        document.getElementById('question').textContent = "Error fetching the question. Please try again.";
+    }
+}
 
 function correctAnswer() {
     score += 10;
-    updateScore(); // Update score when answered correctly
+    updateScore();
     getQuestion();
 }
 
@@ -70,7 +66,7 @@ function wrongAnswer() {
 }
 
 function updateScore() {
-    scoreDisplay.textContent = score; // Update the displayed score
+    scoreDisplay.textContent = score;
 }
 
 function startTimer() {
@@ -84,12 +80,6 @@ function startTimer() {
     }, 1000);
 }
 
-// function endGame() {
-//     clearInterval(interval);
-//     document.getElementById('quizScreen').classList.add('hidden');
-//     document.getElementById('endScreen').classList.remove('hidden');
-//     document.getElementById('finalScore').textContent = score;
-// }
 function endGame() {
     clearInterval(interval);
     document.getElementById('quizScreen').classList.add('hidden');
@@ -98,10 +88,9 @@ function endGame() {
 
     if (score <= 20) {
         endMessage.textContent = "You played poor.";
-    } else if(score > 20 && score<=50){
+    } else if(score > 20 && score <= 50) {
         endMessage.textContent = "You played good";
-    }
-    else{
+    } else {
         endMessage.textContent = "You were excellent during the quizz."
     }
 
