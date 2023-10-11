@@ -4,8 +4,10 @@ let interval;
 
 // Select the score display element
 const scoreDisplay = document.getElementById('score');
+const startRulesDiv = document.getElementById("start-rules");
 
 document.getElementById('startQuiz').addEventListener('click', function () {
+    startRulesDiv.style.display = "none";
     document.getElementById('startScreen').classList.add('hidden');
     document.getElementById('quizScreen').classList.remove('hidden');
     getQuestion();
@@ -82,9 +84,28 @@ function startTimer() {
     }, 1000);
 }
 
+// function endGame() {
+//     clearInterval(interval);
+//     document.getElementById('quizScreen').classList.add('hidden');
+//     document.getElementById('endScreen').classList.remove('hidden');
+//     document.getElementById('finalScore').textContent = score;
+// }
 function endGame() {
     clearInterval(interval);
     document.getElementById('quizScreen').classList.add('hidden');
+    const endMessage = document.getElementById('endMessage');
+    const finalScoreDisplay = document.getElementById('finalScore');
+
+    if (score <= 20) {
+        endMessage.textContent = "You played poor.";
+    } else if(score > 20 && score<=50){
+        endMessage.textContent = "You played good";
+    }
+    else{
+        endMessage.textContent = "You were excellent during the quizz."
+    }
+
+    endMessage.classList.remove('hidden');
+    finalScoreDisplay.textContent = "Your score: " + score;
     document.getElementById('endScreen').classList.remove('hidden');
-    document.getElementById('finalScore').textContent = score;
 }

@@ -101,51 +101,34 @@ describe('End quizz', ()=>{
         cy.get('#playAgain').click();
         cy.get('#quizScreen').should('not.have.class', 'hidden');
     });
-    it('should display the final score correctly at the end of the game', function() {
-        // First, set up the intercept for the API call
-        cy.intercept('https://opentdb.com/api.php?amount=1', {
+    it('Displays the correct final score on end screen', () => {
+        cy.intercept('GET', 'https://opentdb.com/api.php?amount=1', {
+            // This is the mock response structure based on the API you've mentioned. 
+            // Adjust it if the real API response is different.
             body: {
-                response_code: 0,
-                results: [{
-                    category: "Test Category",
-                    type: "multiple",
-                    difficulty: "easy",
-                    question: "Test Question",
-                    correct_answer: "Correct Answer",
-                    incorrect_answers: ["Wrong 1", "Wrong 2", "Wrong 3"]
+                "results": [{
+                    "question": "Mocked Question?",
+                    "correct_answer": "Correct Answer",
+                    "incorrect_answers": ["Wrong 1", "Wrong 2", "Wrong 3"]
                 }]
             }
-        });
-
-        // Now visit the app
-        cy.visit('/');
-        
+        }).as('fetchQuestion');
+        // Click on Start Quiz
         cy.get('#startQuiz').click();
 
-        // Ensure the initial score is 0.
-        cy.get('#score').should('have.text', '0');
-
-        // Wait for button with "Correct Answer" to appear and then click it
-        cy.contains('button', 'Correct Answer', { timeout: 10000 }).should('exist').click();
-
-        // Mock the game's end condition by setting the timer to 0.
+        // Answer 3 questions correctly using the mock data
+        for (let i = 0; i < 3; i++) {
+            cy.wait('@fetchQuestion');  // Wait for the mock API response
+            cy.get('.answer').contains('Correct Answer').click();
+        }
         cy.window().invoke('eval', 'timer = 0');
         
-        cy.wait(2000);  // Short wait to give the app some time to process
+        cy.wait(2000);
 
-        // The final score should be displayed correctly on the end screen.
-        cy.get('#finalScore').should('have.text', '10');
+        // Check the end screen for the correct score
+        cy.get('#finalScore').should('contain', 'Your score: 30'); // 3 questions * 10 marks each = 30
     });
 })
-
-// describe('Display the final score', ()=>{
-//     // beforeEach(() => {
-//     //     cy.clearLocalStorage();
-//     // });
-
-    
-// });
-
 
 describe('Handling API failure', ()=>{
     beforeEach(()=>{
@@ -156,6 +139,30 @@ describe('Handling API failure', ()=>{
         cy.get('#startQuiz').click();
         cy.wait('@getQuestionFailure');
         cy.get('#quizScreen').should('not.have.class', 'hidden');
+    });
+    it('Handles missing data in API response', () => {
+        cy.intercept('GET', 'https://opentdb.com/api.php?amount=1', {
+            body: {
+                "results": [{}]
+            }
+        }).as('fetchQuestionIncompleteData');
+    
+        cy.get('#startQuiz').click();
+        cy.wait('@fetchQuestionIncompleteData');
+    
+        cy.get('#question').should('contain', 'Error fetching the question. Please try again.');
+    });
+    it('Handles unexpected data in API response', () => {
+        cy.intercept('GET', 'https://opentdb.com/api.php?amount=1', {
+            body: {
+                "unexpectedField": "unexpectedValue"
+            }
+        }).as('fetchQuestionUnexpectedData');
+    
+        cy.get('#startQuiz').click();
+        cy.wait('@fetchQuestionUnexpectedData');
+    
+        cy.get('#question').should('contain', 'Error fetching the question. Please try again.');
     });
 })
 
